@@ -20,6 +20,10 @@ const giftsCollection = db.collection('gifts');
 // Elementos do DOM
 const giftForm = document.getElementById('giftForm');
 const giftsList = document.getElementById('gifts');
+const filterSelect = document.getElementById('filterBy');
+
+let currentFilter = 'all';
+let cachedDocs = [];
 
 // Adiciona presente quando o formulário é enviado
 giftForm.addEventListener('submit', async (e) => {
@@ -27,6 +31,8 @@ giftForm.addEventListener('submit', async (e) => {
     const title = giftForm.title.value.trim();
     const link = giftForm.link.value.trim();
     const description = giftForm.description.value.trim();
+    const priceVal = giftForm.price ? giftForm.price.value.trim() : '';
+    const price = priceVal ? parseFloat(priceVal) : null;
     const addedBy = giftForm.addedBy.value;
     if (!title || !link || !addedBy) {
         alert('Por favor, preencha nome, link e quem adicionou.');
@@ -37,6 +43,7 @@ giftForm.addEventListener('submit', async (e) => {
             title,
             link,
             description,
+            price,
             addedBy,
             createdAt: firebase.firestore.FieldValue.serverTimestamp()
         });
@@ -61,6 +68,20 @@ function renderGift(doc) {
     titleEl.rel = 'noopener';
     titleEl.textContent = doc.data().title;
     infoDiv.appendChild(titleEl);
+    if (doc.data().price != null) {
+        const priceEl = document.createElement('div');
+        priceEl.classList.add('price');
+        const priceNumber = Number(doc.data().price);
+        try {
+            priceEl.textContent = priceNumber.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+        } catch (e) {
+            priceEl.textContent = 'R$ ' + priceNumber.toFixed(2);
+        }
+        priceEl.style.marginTop = '0.25rem';
+        priceEl.style.fontWeight = '600';
+        priceEl.style.color = '#b22b57';
+        infoDiv.appendChild(priceEl);
+    }
     if (doc.data().description) {
         const desc = document.createElement('p');
         desc.textContent = doc.data().description;
@@ -74,17 +95,28 @@ function renderGift(doc) {
     addedByEl.textContent = `Adicionado por: ${doc.data().addedBy}`;
     infoDiv.appendChild(addedByEl);
     
+    const actions = document.createElement('div');
+    actions.classList.add('actions');
+
+    const markGivenBtn = document.createElement('button');
+    markGivenBtn.textContent = 'Marcar como dado';
+    markGivenBtn.classList.add('mark-given');
+    markGivenBtn.addEventListener('click', async () => {
+        if (confirm('Marcar este presente como dado? Ele será removido da lista.')) {
+            try {
+                await giftsCollection.doc(doc.id).delete();
+            } catch (error) {
+                console.error('Erro ao marcar como dado:', error);
+                alert('Erro ao marcar como dado.');
+            }
+        }
+    });
+
     const removeBtn = document.createElement('button');
     removeBtn.textContent = 'Remover';
-    removeBtn.style.backgroundColor = '#ffa5b4';
-    removeBtn.style.border = 'none';
-    removeBtn.style.color = '#fff';
-    removeBtn.style.padding = '0.4rem 0.6rem';
-    removeBtn.style.marginLeft = '0.6rem';
-    removeBtn.style.borderRadius = '4px';
-    removeBtn.style.cursor = 'pointer';
+    removeBtn.classList.add('remove');
     removeBtn.addEventListener('click', async () => {
-        if (confirm('Deseja remover este presente?')) {
+        if (confirm('Deseja remover este presente permanentemente?')) {
             try {
                 await giftsCollection.doc(doc.id).delete();
             } catch (error) {
@@ -93,18 +125,36 @@ function renderGift(doc) {
             }
         }
     });
-    
+
+    actions.appendChild(markGivenBtn);
+    actions.appendChild(removeBtn);
+
     li.appendChild(infoDiv);
-    li.appendChild(removeBtn);
+    li.appendChild(actions);
     
     giftsList.appendChild(li);
 }
 
+function renderList() {
+    giftsList.innerHTML = '';
+    cachedDocs.forEach((doc) => {
+        const addedBy = doc.data().addedBy;
+        if (currentFilter === 'all' || addedBy === currentFilter) {
+            renderGift(doc);
+        }
+    });
+}
+
 // Atualiza a lista em tempo real
 giftsCollection.orderBy('createdAt').onSnapshot((snapshot) => {
-    // Limpa lista atual
-    giftsList.innerHTML = '';
-    snapshot.forEach((doc) => {
-        renderGift(doc);
-    });
+    // Cache dos documentos e render com filtro
+    cachedDocs = snapshot.docs;
+    renderList();
 });
+
+if (filterSelect) {
+    filterSelect.addEventListener('change', (e) => {
+        currentFilter = e.target.value;
+        renderList();
+    });
+}

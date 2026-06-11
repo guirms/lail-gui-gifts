@@ -32,7 +32,7 @@ main {
     flex: 1;
     padding: 1rem;
     max-width: 800px;
-    width: 100%;
+    width: 90%;
     margin: 0 auto;
 }
 
@@ -57,6 +57,39 @@ section {
     display: block;
     margin-bottom: 0.3rem;
     font-weight: 600;
+}
+
+.filter-row {
+    display: flex;
+    gap: 0.6rem;
+    align-items: center;
+    margin-bottom: 0.75rem;
+}
+
+.filter-row label {
+    font-weight: 600;
+    color: #444;
+}
+
+#filterBy {
+    padding: 0.45rem 0.6rem;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    background: #fff;
+    color: #333;
+    font-family: inherit;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.03);
+}
+
+/* Mobile: empilha o filtro */
+@media (max-width: 600px) {
+    .filter-row {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    #filterBy {
+        width: 100%;
+    }
 }
 
 .form-group input,
@@ -117,6 +150,34 @@ button#addBtn:hover {
     color: #666;
 }
 
+#gifts li .price {
+    font-size: 1rem;
+    color: #b22b57;
+    margin-left: 0.6rem;
+}
+
+.actions {
+    display: flex;
+    gap: 0.5rem;
+    margin-left: 1rem;
+}
+
+.actions button {
+    border: none;
+    padding: 0.4rem 0.6rem;
+    border-radius: 4px;
+    cursor: pointer;
+    color: #fff;
+}
+
+.actions .mark-given {
+    background-color: #4caf50;
+}
+
+.actions .remove {
+    background-color: #ff6b81;
+}
+
 footer {
     text-align: center;
     padding: 1rem;
@@ -131,5 +192,20 @@ footer {
     }
     button#addBtn {
         width: 100%;
+    }
+    section {
+        padding: 0.8rem;
+    }
+    #gifts li {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    .actions {
+        width: 100%;
+        justify-content: flex-end;
+        margin-top: 0.6rem;
+    }
+    .actions button {
+        flex: 1 1 auto;
     }
 }
