@@ -1,59 +1,150 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lista de Presentes – Guilherme & Laís</title>
-    <link rel="stylesheet" href="styles.css">
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Lista de Presentes – Guilherme &amp; Laís</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
-    <header>
-        <h1>🎁 Lista de Presentes</h1>
-        <p>Guilherme &amp; Laís</p>
-    </header>
 
-    <main>
-        <section id="add-gift">
-            <h2>Adicionar presente</h2>
-            <form id="giftForm">
-                <div class="form-group">
-                    <label for="title">Nome do presente:</label>
-                    <input type="text" id="title" name="title" required placeholder="Ex.: Camisa legal">
-                </div>
-                <div class="form-group">
-                    <label for="link">Link do produto:</label>
-                    <input type="url" id="link" name="link" required placeholder="https://...">
-                </div>
-                <div class="form-group">
-                    <label for="description">Descrição (opcional):</label>
-                    <textarea id="description" name="description" rows="3" placeholder="Tamanho, cor, etc."></textarea>
-                </div>
-                <div class="form-group">
-                    <label for="addedBy">Quem adicionou:</label>
-                    <select id="addedBy" name="addedBy" required>
-                        <option value="Guilherme">Guilherme</option>
-                        <option value="Laís">Laís</option>
-                    </select>
-                </div>
-                <button type="submit" id="addBtn">Adicionar presente</button>
-            </form>
-        </section>
+  <header>
+    <div class="header-inner">
+      <div class="header-names">
+        <span class="name-badge gui">G</span>
+        <span class="heart-icon">♥</span>
+        <span class="name-badge lais">L</span>
+      </div>
+      <h1>Lista de Presentes</h1>
+      <p class="subtitle">Guilherme &amp; Laís</p>
+    </div>
+  </header>
 
-        <section id="gift-list">
-            <h2>Presentes desejados</h2>
-            <ul id="gifts"></ul>
-        </section>
-    </main>
+  <main>
 
-    <footer>
-        <p>Feito com ❤️ por Guilherme &amp; Laís</p>
-    </footer>
+    <!-- Formulário de adição -->
+    <section class="card" id="add-section">
+      <div class="card-header" id="toggle-form-btn" role="button" tabindex="0" aria-expanded="true">
+        <h2>✦ Adicionar presente</h2>
+        <span class="toggle-icon">▲</span>
+      </div>
+      <div class="form-body" id="form-body">
+        <form id="giftForm" novalidate>
+          <div class="form-grid">
+            <div class="form-group span2">
+              <label for="title">Nome do presente</label>
+              <input type="text" id="title" name="title" required placeholder="Ex.: Camisa branca M" />
+            </div>
+            <div class="form-group span2">
+              <label for="link">Link do produto</label>
+              <input type="url" id="link" name="link" required placeholder="https://..." />
+            </div>
+            <div class="form-group">
+              <label for="price">Preço (R$)</label>
+              <input type="number" id="price" name="price" min="0" step="0.01" placeholder="0,00" />
+            </div>
+            <div class="form-group">
+              <label for="addedBy">Para quem é?</label>
+              <select id="addedBy" name="addedBy" required>
+                <option value="Guilherme">🎁 Guilherme quer receber</option>
+                <option value="Laís">🎁 Laís quer receber</option>
+              </select>
+            </div>
+            <div class="form-group span2">
+              <label for="description">Observações (opcional)</label>
+              <textarea id="description" name="description" rows="2" placeholder="Tamanho, cor, loja preferida..."></textarea>
+            </div>
+          </div>
+          <div class="form-footer">
+            <button type="submit" id="addBtn">
+              <span id="btn-text">Adicionar presente</span>
+            </button>
+          </div>
+        </form>
+      </div>
+    </section>
 
-    <!-- Firebase SDKs -->
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
-    <script src="script.js"></script>
+    <!-- Filtros -->
+    <div class="filters-bar">
+      <button class="filter-btn active" data-filter="all">
+        <span class="filter-icon">💝</span> Todos
+      </button>
+      <button class="filter-btn" data-filter="Guilherme">
+        <span class="filter-icon gui-dot">G</span> Guilherme
+      </button>
+      <button class="filter-btn" data-filter="Laís">
+        <span class="filter-icon lais-dot">L</span> Laís
+      </button>
+      <span class="gift-count" id="giftCount">0 presentes</span>
+    </div>
+
+    <!-- Lista de presentes -->
+    <section id="gift-list">
+      <div id="gifts-grid"></div>
+      <div id="empty-state" class="empty-state hidden">
+        <span class="empty-icon">🎀</span>
+        <p>Nenhum presente ainda.<br>Que tal adicionar o primeiro?</p>
+      </div>
+      <div id="loading-state" class="loading-state">
+        <div class="spinner"></div>
+        <p>Carregando presentes...</p>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Modal de edição -->
+  <div class="modal-overlay" id="editModal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 id="modal-title">Editar presente</h3>
+        <button class="modal-close" id="closeModal" aria-label="Fechar">✕</button>
+      </div>
+      <form id="editForm" novalidate>
+        <input type="hidden" id="editId" />
+        <div class="form-group">
+          <label for="editTitle">Nome do presente</label>
+          <input type="text" id="editTitle" required />
+        </div>
+        <div class="form-group">
+          <label for="editLink">Link do produto</label>
+          <input type="url" id="editLink" required />
+        </div>
+        <div class="form-grid two-col">
+          <div class="form-group">
+            <label for="editPrice">Preço (R$)</label>
+            <input type="number" id="editPrice" min="0" step="0.01" />
+          </div>
+          <div class="form-group">
+            <label for="editAddedBy">Para quem é?</label>
+            <select id="editAddedBy">
+              <option value="Guilherme">Guilherme</option>
+              <option value="Laís">Laís</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="editDescription">Observações</label>
+          <textarea id="editDescription" rows="2"></textarea>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn-outline" id="cancelEdit">Cancelar</button>
+          <button type="submit" class="btn-primary">Salvar alterações</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <footer>
+    <p>Feito com ❤️ por Guilherme &amp; Laís</p>
+  </footer>
+
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+  <script src="script.js"></script>
 </body>
 </html>
