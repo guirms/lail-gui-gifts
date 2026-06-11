@@ -1,0 +1,135 @@
+/* Fonte base */
+body {
+    margin: 0;
+    font-family: 'Poppins', sans-serif;
+    background: linear-gradient(135deg, #ffe5ec, #ffc2d1);
+    color: #333;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+header {
+    background-color: #ff9aa2;
+    color: #fff;
+    padding: 1rem;
+    text-align: center;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+header h1 {
+    margin: 0;
+    font-size: 2rem;
+}
+
+header p {
+    margin: 0.2rem 0 0;
+    font-size: 1rem;
+    font-weight: 300;
+}
+
+main {
+    flex: 1;
+    padding: 1rem;
+    max-width: 800px;
+    width: 100%;
+    margin: 0 auto;
+}
+
+h2 {
+    margin-top: 0;
+    color: #d64e80;
+}
+
+section {
+    background: #fff;
+    padding: 1rem 1.5rem;
+    margin-bottom: 1.5rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+.form-group {
+    margin-bottom: 1rem;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 0.3rem;
+    font-weight: 600;
+}
+
+.form-group input,
+.form-group textarea,
+.form-group select {
+    width: 100%;
+    padding: 0.5rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    box-sizing: border-box;
+    font-family: inherit;
+}
+
+button#addBtn {
+    background-color: #d64e80;
+    color: #fff;
+    border: none;
+    padding: 0.6rem 1rem;
+    font-size: 1rem;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+button#addBtn:hover {
+    background-color: #c53a6e;
+}
+
+#gift-list ul {
+    list-style: none;
+    padding: 0;
+}
+
+#gifts li {
+    background-color: #ffe5ec;
+    border: 1px solid #ffd6e0;
+    margin-bottom: 0.6rem;
+    padding: 0.8rem;
+    border-radius: 6px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+#gifts li a {
+    color: #d64e80;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+#gifts li .info {
+    flex: 1;
+}
+
+#gifts li .added-by {
+    font-size: 0.9rem;
+    color: #666;
+}
+
+footer {
+    text-align: center;
+    padding: 1rem;
+    background-color: #ffd6e0;
+    color: #a02c54;
+    margin-top: auto;
+}
+
+@media (max-width: 600px) {
+    header h1 {
+        font-size: 1.6rem;
+    }
+    button#addBtn {
+        width: 100%;
+    }
+}
