@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#e0567f">
+    <meta name="description" content="Lista de presentes compartilhada do Guilherme &amp; Laís">
+    <title>Lista de Presentes – Guilherme &amp; Laís</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎁</text></svg>">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<!-- ============================ TELA DE SENHA ============================ -->
+<div id="lockScreen" class="lock-screen" hidden>
+    <form class="lock-card" id="loginForm">
+        <div class="lock-emoji">🔒</div>
+        <h1>Lista de Presentes</h1>
+        <p class="muted">Um cantinho só de vocês dois.</p>
+        <label class="sr-only" for="password">Senha</label>
+        <input type="password" id="password" name="password" placeholder="Senha do casal" autocomplete="current-password" required>
+        <button type="submit" class="btn btn-primary btn-block">Entrar</button>
+        <p class="form-error" id="loginError" role="alert"></p>
+    </form>
+</div>
+
+<!-- ========================= SELETOR DE PERFIL ========================== -->
+<div id="profileScreen" class="lock-screen" hidden>
+    <div class="lock-card">
+        <div class="lock-emoji">💌</div>
+        <h1>Quem é você?</h1>
+        <p class="muted">
+            Isso mantém as surpresas em segredo: você nunca vê quem já
+            reservou os presentes que <em>você</em> pediu.
+        </p>
+        <div class="profile-options" id="profileOptions"></div>
+    </div>
+</div>
+
+<!-- ================================ APP ================================= -->
+<div id="app" hidden>
+
+    <header class="site-header">
+        <div class="header-inner">
+            <div class="brand">
+                <span class="brand-mark">🎁</span>
+                <div>
+                    <h1>Lista de Presentes</h1>
+                    <p id="brandSubtitle">Guilherme &amp; Laís</p>
+                </div>
+            </div>
+
+            <div class="header-actions">
+                <button type="button" class="chip-btn" id="profileChip" title="Trocar de perfil">
+                    <span class="avatar" id="profileAvatar">?</span>
+                    <span id="profileName">…</span>
+                </button>
+                <button type="button" class="icon-btn" id="themeToggle" title="Alternar tema" aria-label="Alternar tema">
+                    <span id="themeIcon">🌙</span>
+                </button>
+                <button type="button" class="icon-btn" id="logoutBtn" title="Sair" aria-label="Sair" hidden>⏻</button>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <!-- Estatísticas -->
+        <section class="stats" id="stats" aria-label="Resumo"></section>
+
+        <!-- Barra de ferramentas -->
+        <section class="toolbar">
+            <div class="tabs" role="tablist">
+                <button type="button" class="tab is-active" id="tabWanted" role="tab" aria-selected="true" data-status="wanted">
+                    Lista de desejos
+                </button>
+                <button type="button" class="tab" id="tabGiven" role="tab" aria-selected="false" data-status="given">
+                    Já ganhamos
+                </button>
+            </div>
+
+            <button type="button" class="btn btn-primary" id="openAddBtn">
+                <span aria-hidden="true">＋</span> Novo presente
+            </button>
+        </section>
+
+        <section class="filters">
+            <div class="search-wrap">
+                <span class="search-icon" aria-hidden="true">🔍</span>
+                <input type="search" id="search" placeholder="Buscar por nome, descrição ou loja…" aria-label="Buscar presentes">
+            </div>
+
+            <label class="field-inline">
+                <span>De</span>
+                <select id="filterPerson"><option value="all">Todo mundo</option></select>
+            </label>
+
+            <label class="field-inline">
+                <span>Categoria</span>
+                <select id="filterCategory"><option value="all">Todas</option></select>
+            </label>
+
+            <label class="field-inline">
+                <span>Ordenar</span>
+                <select id="sortBy">
+                    <option value="recentes">Mais recentes</option>
+                    <option value="antigos">Mais antigos</option>
+                    <option value="prioridade">Prioridade</option>
+                    <option value="preco-maior">Maior preço</option>
+                    <option value="preco-menor">Menor preço</option>
+                    <option value="titulo">Nome (A–Z)</option>
+                </select>
+            </label>
+        </section>
+
+        <!-- Lista -->
+        <section id="giftsSection" aria-live="polite">
+            <div class="gift-grid" id="giftGrid"></div>
+            <div class="empty-state" id="emptyState" hidden></div>
+        </section>
+    </main>
+
+    <footer class="site-footer">
+        <p>Feito com ❤️ por Guilherme &amp; Laís</p>
+    </footer>
+</div>
+
+<!-- ====================== MODAL ADICIONAR/EDITAR ======================== -->
+<dialog id="giftDialog" class="dialog">
+    <form id="giftForm">
+        <header class="dialog-header">
+            <h2 id="dialogTitle">Novo presente</h2>
+            <button type="button" class="icon-btn" id="closeDialogBtn" aria-label="Fechar">✕</button>
+        </header>
+
+        <div class="dialog-body">
+            <input type="hidden" id="giftId">
+
+            <div class="form-group">
+                <label for="fieldLink">Link do produto</label>
+                <div class="link-row">
+                    <input type="url" id="fieldLink" placeholder="https://loja.com/produto" inputmode="url">
+                    <button type="button" class="btn btn-ghost" id="previewBtn" title="Preencher automaticamente a partir do link">
+                        ✨ Preencher
+                    </button>
+                </div>
+                <p class="hint" id="previewHint">Cole o link e clique em “Preencher” para buscar nome, imagem e preço.</p>
+            </div>
+
+            <div class="preview-card" id="previewCard" hidden>
+                <img id="previewImage" alt="">
+                <button type="button" class="preview-remove" id="removeImageBtn" title="Remover imagem">✕</button>
+            </div>
+
+            <div class="form-group">
+                <label for="fieldTitle">Nome do presente <span class="req">*</span></label>
+                <input type="text" id="fieldTitle" required maxlength="200" placeholder="Ex.: Camisa de linho azul">
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="fieldPrice">Preço aproximado</label>
+                    <input type="number" id="fieldPrice" step="0.01" min="0" placeholder="0,00">
+                </div>
+                <div class="form-group">
+                    <label for="fieldPriority">Vontade</label>
+                    <select id="fieldPriority">
+                        <option value="1">😊 Seria legal</option>
+                        <option value="2" selected>😍 Quero muito</option>
+                        <option value="3">🤩 Sonho de consumo</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="fieldCategory">Ocasião</label>
+                    <select id="fieldCategory"></select>
+                </div>
+                <div class="form-group">
+                    <label for="fieldAddedBy">Quem está pedindo <span class="req">*</span></label>
+                    <select id="fieldAddedBy" required></select>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="fieldDescription">Detalhes</label>
+                <textarea id="fieldDescription" rows="3" maxlength="1000" placeholder="Tamanho, cor, modelo, onde encontrar…"></textarea>
+            </div>
+
+            <p class="form-error" id="formError" role="alert"></p>
+        </div>
+
+        <footer class="dialog-footer">
+            <button type="button" class="btn btn-ghost" id="cancelBtn">Cancelar</button>
+            <button type="submit" class="btn btn-primary" id="saveBtn">Salvar presente</button>
+        </footer>
+    </form>
+</dialog>
+
+<!-- ========================= MODAL DE CONFIRMAÇÃO ======================= -->
+<dialog id="confirmDialog" class="dialog dialog-sm">
+    <div class="dialog-body">
+        <h2 id="confirmTitle">Tem certeza?</h2>
+        <p id="confirmMessage" class="muted"></p>
+    </div>
+    <footer class="dialog-footer">
+        <button type="button" class="btn btn-ghost" id="confirmCancel">Cancelar</button>
+        <button type="button" class="btn btn-danger" id="confirmOk">Confirmar</button>
+    </footer>
+</dialog>
+
+<div class="toasts" id="toasts" aria-live="polite" aria-atomic="true"></div>
+
+<script src="app.js" type="module"></script>
+</body>
+</html>
