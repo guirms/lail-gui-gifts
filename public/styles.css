@@ -78,6 +78,11 @@
 
 * { box-sizing: border-box; }
 
+/* Qualquer `display` declarado aqui vence a regra [hidden] do navegador, o que
+   faria o atributo hidden parar de esconder o elemento. Este reset garante que
+   hidden sempre ganhe — as telas de senha/perfil dependem disso. */
+[hidden] { display: none !important; }
+
 html { -webkit-text-size-adjust: 100%; }
 
 body {

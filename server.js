@@ -407,7 +407,10 @@ app.use('/api', api);
  * Site estático + tratamento de erros
  * ------------------------------------------------------------------ */
 
-app.use(express.static(path.join(__dirname, 'public'), { maxAge: '1h' }));
+// Sem maxAge o Express usa ETag: o navegador revalida a cada visita e recebe
+// 304 quando nada mudou. Com cache longo, um deploy de correção demoraria
+// horas pra chegar em quem já tinha aberto o site.
+app.use(express.static(path.join(__dirname, 'public')));
 
 app.get('/healthz', h(async (req, res) => {
   try {
